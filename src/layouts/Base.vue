@@ -33,6 +33,12 @@
                             男性面壁者
                         </el-menu-item>
                     </el-sub-menu>
+                    <el-sub-menu index="tools">
+                        <template #title>
+                            教学工具
+                        </template>
+                        <el-menu-item index="/whiteboards">白板</el-menu-item>
+                    </el-sub-menu>
                 </el-menu>
             </el-aside>
             <el-main>
