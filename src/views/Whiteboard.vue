@@ -1,4 +1,6 @@
 <template>
+    <canvas ref="c" width="500" height="500"></canvas>
+
     <el-tabs ref="tabs" v-model="tabActive" editable @tab-remove="handleRemove" @tab-add="handleAdd">
         <el-tab-pane
             v-for="(item, index) in whiteboards"
@@ -35,6 +37,7 @@
 </template>
 
 <script>
+import { fabric } from 'fabric'
 import { ElMessageBox } from 'element-plus'
 import 'element-plus/es/components/message-box/style/css'
 
@@ -114,6 +117,15 @@ export default {
     mounted() {
         this.init()
         window.addEventListener('resize', () => this.init())
+
+        const el = this.$refs.c
+        const canvas = new fabric.Canvas(el)
+
+        const circle = new fabric.Circle({ radius: 40, fill: '#ff0000', top: 100, left: 100 })
+        canvas.add(circle)
+
+        const rect1 = new fabric.Rect({ width: 50, height: 20, fill: '#ffff00', opacity: .7 })
+        canvas.add(rect1)
     },
 }
 </script>

@@ -2,13 +2,14 @@
   "name": "mianbi-admin",
   "version": "0.0.0",
   "scripts": {
-    "dev1": "vite",
+    "dev": "vite",
     "build": "vite build",
     "preview": "vite preview --port 4173",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
     "element-plus": "^2.2.5",
+    "fabric": "^5.2.1",
     "pinia": "^2.0.14",
     "vue": "^3.2.36",
     "vue-router": "^4.0.15"
