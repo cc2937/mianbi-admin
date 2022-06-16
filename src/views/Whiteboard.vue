@@ -28,6 +28,7 @@
 import { fabric } from 'fabric'
 import { ElMessageBox } from 'element-plus'
 import 'element-plus/es/components/message-box/style/css'
+import { markRaw } from 'vue'
 
 export default {
     data() {
@@ -102,11 +103,14 @@ export default {
             } catch (e) { }
         },
         getCanvas(index) {
-            const canvas = this.whiteboards[index].canvas
+            const whiteboard = this.whiteboards[index]
+
+            const canvas = whiteboard.canvas
             if (canvas) return canvas
+
             const el = this.$refs.canvas[index]
-            this.whiteboards[index].canvas = new fabric.Canvas(el)
-            return this.whiteboards[index].canvas
+            whiteboard.canvas = markRaw(new fabric.Canvas(el))
+            return whiteboard.canvas
         },
     },
     mounted() {
