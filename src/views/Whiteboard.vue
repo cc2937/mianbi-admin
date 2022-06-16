@@ -1,13 +1,6 @@
 <template>
-    <canvas ref="c" width="500" height="500"></canvas>
-
     <el-tabs ref="tabs" v-model="tabActive" editable @tab-remove="handleRemove" @tab-add="handleAdd">
-        <el-tab-pane
-            v-for="(item, index) in whiteboards"
-            :key="item.id"
-            :label="item.title"
-            :name="item.id"
-        >
+        <el-tab-pane v-for="(item, index) in whiteboards" :key="item.id" :label="item.title" :name="item.id">
             <canvas ref="canvas" @mousedown="handleDraw($event, index)" :width="canvasWidth" height="450"></canvas>
 
             <div class="toolbar">
@@ -19,12 +12,7 @@
                 <template v-if="item.mode === 'pen'">
                     <el-color-picker v-model="item.color" :predefine="colors" />
                     <el-select v-model="item.width">
-                        <el-option
-                            v-for="item in widths"
-                            :key="item.value"
-                            :value="item.value"
-                            :label="item.label"
-                        >
+                        <el-option v-for="item in widths" :key="item.value" :value="item.value" :label="item.label">
                         </el-option>
                     </el-select>
                 </template>
@@ -61,7 +49,7 @@ export default {
     },
     methods: {
         init() {
-           this.canvasWidth = this.$refs.tabs.$el.getBoundingClientRect().width
+            this.canvasWidth = this.$refs.tabs.$el.getBoundingClientRect().width
         },
         handleRemove(name) {
             const index = this.whiteboards.findIndex(item => item.id === name)
@@ -111,21 +99,34 @@ export default {
             try {
                 const { value } = await ElMessageBox.prompt('请输入白板名称', '重命名白板', {})
                 this.whiteboards[index].title = value
-            } catch (e) {}
+            } catch (e) { }
+        },
+        getCanvas(index) {
+            const canvas = this.whiteboards[index].canvas
+            if (canvas) return canvas
+            const el = this.$refs.canvas[index]
+            this.whiteboards[index].canvas = new fabric.Canvas(el)
+            return this.whiteboards[index].canvas
         },
     },
     mounted() {
-        this.init()
+        this.init() // this.canvasWidth = 1000  => <canvas width="1000">
         window.addEventListener('resize', () => this.init())
 
-        const el = this.$refs.c
-        const canvas = new fabric.Canvas(el)
+        this.$nextTick(() => {
+            const canvas = this.getCanvas(0)
+            // canvas.setDimensions({ width: this.canvasWidth, height: 400 })
 
-        const circle = new fabric.Circle({ radius: 40, fill: '#ff0000', top: 100, left: 100 })
-        canvas.add(circle)
+            const rect1 = new fabric.Rect({
+                width: 50,
+                height: 20,
+                fill: '#ffff00',
+                opacity: .7,
+            })
+            canvas.add(rect1)
+        })
 
-        const rect1 = new fabric.Rect({ width: 50, height: 20, fill: '#ffff00', opacity: .7 })
-        canvas.add(rect1)
+
     },
 }
 </script>
@@ -138,5 +139,4 @@ export default {
 .tools {
     margin-right: 24px;
 }
-
 </style>
