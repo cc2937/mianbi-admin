@@ -1,17 +1,20 @@
 <template>
     <el-tabs ref="tabs" v-model="tabActive" editable @tab-remove="handleRemove" @tab-add="handleAdd">
         <el-tab-pane v-for="(item, index) in whiteboards" :key="item.id" :label="item.title" :name="item.id">
-            <canvas ref="canvas" @mousedown="handleDraw($event, index)" :width="canvasWidth" height="450"></canvas>
+            <div class="canvas-container" @keyup.delete="hanldeObjectDelete">
+                <canvas ref="canvas" :width="canvasWidth" height="450"></canvas>
+            </div>
 
             <div class="toolbar">
-                <el-radio-group v-model="item.mode" class="tools">
+                <el-radio-group v-model="item.mode" class="tools" @change="syncCanvas(index)">
                     <el-radio-button label="pen">画笔</el-radio-button>
                     <el-radio-button label="eraser">橡皮擦</el-radio-button>
+                    <el-radio-button label="select">选择</el-radio-button>
                 </el-radio-group>
 
                 <template v-if="item.mode === 'pen'">
-                    <el-color-picker v-model="item.color" :predefine="colors" />
-                    <el-select v-model="item.width">
+                    <el-color-picker v-model="item.color" :predefine="colors" @change="syncCanvas(index)" />
+                    <el-select v-model="item.width" @change="syncCanvas(index)">
                         <el-option v-for="item in widths" :key="item.value" :value="item.value" :label="item.label">
                         </el-option>
                     </el-select>
@@ -26,6 +29,7 @@
 
 <script>
 import { fabric } from 'fabric'
+import 'fabric/src/mixins/eraser_brush.mixin.js'
 import { ElMessageBox } from 'element-plus'
 import 'element-plus/es/components/message-box/style/css'
 import { markRaw } from 'vue'
@@ -57,15 +61,20 @@ export default {
             this.whiteboards.splice(index, 1)
         },
         handleAdd() {
-            this.whiteboards.push({
+            const whiteboard = {
                 id: this.nextTab,
                 title: `白板 ${this.nextTab}`,
                 color: '#ff0000',
                 width: 3,
                 mode: 'pen'
-            })
+            }
+            this.whiteboards.push(whiteboard)
             this.tabActive = this.nextTab
             this.nextTab++
+            this.$nextTick(() => {
+                const index = this.nextTab - 2
+                this.syncCanvas(index)
+            })
         },
         handleDraw(event, index) {
             const canvas = event.target
@@ -93,8 +102,8 @@ export default {
             }
         },
         clear(index) {
-            const canvas = this.$refs.canvas[index]
-            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
+            const canvas = this.getCanvas(index)
+            canvas.clear()
         },
         async rename(index) {
             try {
@@ -104,33 +113,45 @@ export default {
         },
         getCanvas(index) {
             const whiteboard = this.whiteboards[index]
+            let { canvas } = whiteboard
+            if (!canvas) {
+                const el = this.$refs.canvas[index]
+                canvas = new fabric.Canvas(el)
+                whiteboard.canvas = markRaw(canvas)
+            }
+            canvas.selectionColor = 'transparent'
+            canvas.selectionBorderColor = 'rgba(0, 0, 0, 0.2)'
+            return canvas
+        },
+        hanldeObjectDelete(event) {
+            console.dir(event.target)
+        },
+        syncCanvas(index) {
+            const canvas = this.getCanvas(index)
+            const whiteboard = this.whiteboards[index]
+            const { mode } = whiteboard
 
-            const canvas = whiteboard.canvas
-            if (canvas) return canvas
-
-            const el = this.$refs.canvas[index]
-            whiteboard.canvas = markRaw(new fabric.Canvas(el))
-            return whiteboard.canvas
+            if (mode === 'eraser') {
+                canvas.isDrawingMode = true
+                canvas.freeDrawingBrush = new fabric.EraserBrush(canvas)
+                canvas.freeDrawingBrush.width = 30
+            }
+            if (mode === 'pen') {
+                canvas.isDrawingMode = true
+                canvas.freeDrawingBrush = new fabric.PencilBrush(canvas)
+                canvas.freeDrawingBrush.color = whiteboard.color
+                canvas.freeDrawingBrush.width = whiteboard.width
+            }
+            if (mode === 'select') {
+                canvas.isDrawingMode = false
+            }
         },
     },
     mounted() {
         this.init() // this.canvasWidth = 1000  => <canvas width="1000">
         window.addEventListener('resize', () => this.init())
 
-        this.$nextTick(() => {
-            const canvas = this.getCanvas(0)
-            // canvas.setDimensions({ width: this.canvasWidth, height: 400 })
-
-            const rect1 = new fabric.Rect({
-                width: 50,
-                height: 20,
-                fill: '#ffff00',
-                opacity: .7,
-            })
-            canvas.add(rect1)
-        })
-
-
+        this.$nextTick(() => this.syncCanvas(0))
     },
 }
 </script>
