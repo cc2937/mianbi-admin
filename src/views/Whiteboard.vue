@@ -192,6 +192,9 @@ export default {
                 canvas.isDrawingMode = false
                 canvas.skipTargetFind = false
                 fabric.Object.prototype.selectable = true
+            } else {
+                const textboxes = canvas.getObjects('textbox')
+                textboxes.forEach(box => box.exitEditing())
             }
         },
         undo(index) {
