@@ -11,15 +11,15 @@
                     <el-radio-button label="eraser">橡皮擦</el-radio-button>
                     <el-radio-button label="select">选择</el-radio-button>
                     <el-radio-button label="rect">矩形</el-radio-button>
+                    <el-radio-button label="text">文本</el-radio-button>
                 </el-radio-group>
 
-                <template v-if="item.mode === 'pen'">
-                    <el-color-picker v-model="item.color" :predefine="colors" @change="syncCanvas(index)" />
-                    <el-select v-model="item.width" @change="syncCanvas(index)">
-                        <el-option v-for="item in widths" :key="item.value" :value="item.value" :label="item.label">
-                        </el-option>
-                    </el-select>
-                </template>
+                <el-color-picker v-if="['pen', 'rect', 'text'].includes(item.mode)" v-model="item.color"
+                    :predefine="colors" @change="syncCanvas(index)" />
+                <el-select v-if="item.mode === 'pen'" v-model="item.width" @change="syncCanvas(index)">
+                    <el-option v-for="item in widths" :key="item.value" :value="item.value" :label="item.label">
+                    </el-option>
+                </el-select>
 
                 <el-button @click="clear(index)">清屏</el-button>
                 <el-button @click="rename(index)">重命名</el-button>
@@ -121,11 +121,27 @@ export default {
                 whiteboard.canvas = markRaw(canvas)
                 let startX, startY
                 canvas.on('mouse:down', e => {
+                    startX = e.pointer.x
+                    startY = e.pointer.y
                     if (whiteboard.mode === 'rect') {
                         canvas.selectionColor = 'transparent'
                         canvas.selectionBorderColor = whiteboard.color
-                        startX = e.pointer.x
-                        startY = e.pointer.y
+                    }
+                    if (whiteboard.mode === 'text') {
+                        if (!e.target || !e.target.text) {
+                            const text = new fabric.Textbox('', {
+                                stroke: 'rgba(0,0,0,0.25)',
+                                fill: whiteboard.color,
+                                width: 50,
+                                top: startY - 8,
+                                left: startX,
+                                fontSize: 16,
+                                lineHeight: 1,
+                                fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+                            })
+                            canvas.add(text)
+                            text.enterEditing()
+                        }
                     }
                 })
                 canvas.on('mouse:up', e => {
@@ -142,6 +158,7 @@ export default {
                                 strokeWidth: 3,
                                 stroke: whiteboard.color,
                                 fill: 'transparent',
+                                borderScaleFactor: 1,
                             })
                             canvas.add(rect)
                         }
@@ -180,6 +197,11 @@ export default {
                 canvas.isDrawingMode = false
                 canvas.skipTargetFind = true
                 fabric.Object.prototype.selectable = false
+            }
+            if (mode === 'text') {
+                canvas.isDrawingMode = false
+                canvas.skipTargetFind = false
+                fabric.Object.prototype.selectable = true
             }
         },
     },
