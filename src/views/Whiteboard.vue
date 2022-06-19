@@ -9,9 +9,9 @@
                 <el-radio-group v-model="item.mode" class="tools" @change="syncCanvas(index)">
                     <el-radio-button label="pen">画笔</el-radio-button>
                     <el-radio-button label="eraser">橡皮擦</el-radio-button>
-                    <el-radio-button label="select">选择</el-radio-button>
                     <el-radio-button label="rect">矩形</el-radio-button>
                     <el-radio-button label="text">文本</el-radio-button>
+                    <el-radio-button label="select">选择</el-radio-button>
                 </el-radio-group>
 
                 <div class="tool-group">
