@@ -10,6 +10,7 @@
                     <el-radio-button label="pen">画笔</el-radio-button>
                     <el-radio-button label="eraser">橡皮擦</el-radio-button>
                     <el-radio-button label="select">选择</el-radio-button>
+                    <el-radio-button label="rect">矩形</el-radio-button>
                 </el-radio-group>
 
                 <template v-if="item.mode === 'pen'">
@@ -116,11 +117,37 @@ export default {
             let { canvas } = whiteboard
             if (!canvas) {
                 const el = this.$refs.canvas[index]
-                canvas = new fabric.Canvas(el)
+                canvas = new fabric.Canvas(el, { selectionLineWidth: 3 })
                 whiteboard.canvas = markRaw(canvas)
+                let startX, startY
+                canvas.on('mouse:down', e => {
+                    if (whiteboard.mode === 'rect') {
+                        canvas.selectionColor = 'transparent'
+                        canvas.selectionBorderColor = whiteboard.color
+                        startX = e.pointer.x
+                        startY = e.pointer.y
+                    }
+                })
+                canvas.on('mouse:up', e => {
+                    if (whiteboard.mode === 'rect') {
+                        const { x: endX, y: endY } = e.pointer
+                        const tempW = Math.abs(endX - startX)
+                        const tempH = Math.abs(endY - startY)
+                        if (tempW > 3 && tempH > 3) {
+                            const rect = new fabric.Rect({
+                                left: Math.min(startX, endX),
+                                top: Math.min(startY, endY),
+                                width: tempW - 3,
+                                height: tempH - 3,
+                                strokeWidth: 3,
+                                stroke: whiteboard.color,
+                                fill: 'transparent',
+                            })
+                            canvas.add(rect)
+                        }
+                    }
+                })
             }
-            canvas.selectionColor = 'transparent'
-            canvas.selectionBorderColor = 'rgba(0, 0, 0, 0.2)'
             return canvas
         },
         hanldeObjectDelete(event) {
@@ -135,15 +162,24 @@ export default {
                 canvas.isDrawingMode = true
                 canvas.freeDrawingBrush = new fabric.EraserBrush(canvas)
                 canvas.freeDrawingBrush.width = 30
+                canvas.skipTargetFind = true
             }
             if (mode === 'pen') {
                 canvas.isDrawingMode = true
                 canvas.freeDrawingBrush = new fabric.PencilBrush(canvas)
                 canvas.freeDrawingBrush.color = whiteboard.color
                 canvas.freeDrawingBrush.width = whiteboard.width
+                canvas.skipTargetFind = true
             }
             if (mode === 'select') {
                 canvas.isDrawingMode = false
+                canvas.skipTargetFind = false
+                fabric.Object.prototype.selectable = true
+            }
+            if (mode === 'rect') {
+                canvas.isDrawingMode = false
+                canvas.skipTargetFind = true
+                fabric.Object.prototype.selectable = false
             }
         },
     },
