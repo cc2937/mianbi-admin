@@ -53,6 +53,7 @@ export default {
             ],
             nextTab: 2,
             canvasWidth: 0,
+            dpr: 0,
             colors: ['#ff0000', '#ffff00'],
             widths: [
                 { value: 1, label: '极细' },
@@ -65,6 +66,7 @@ export default {
     methods: {
         init() {
             this.canvasWidth = this.$refs.tabs.$el.getBoundingClientRect().width
+            this.dpr = window.devicePixelRatio
             this.$nextTick(() => {
                 this.whiteboards.forEach((_, index) => {
                     const canvas = this.getCanvas(index)
@@ -120,14 +122,13 @@ export default {
                     if (whiteboard.mode === 'text') {
                         if (!e.target || !e.target.text) {
                             const text = new fabric.Textbox('', {
-                                stroke: 'rgba(0,0,0,0.25)',
                                 fill: whiteboard.color,
-                                width: 50,
+                                width: 100,
                                 top: startY - 8,
                                 left: startX,
                                 fontSize: 16,
                                 lineHeight: 1,
-                                fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+                                fontFamily: 'Monaco, monospace',
                             })
                             canvas.add(text)
                             text.enterEditing()
