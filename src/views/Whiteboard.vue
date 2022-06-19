@@ -77,31 +77,6 @@ export default {
                 this.syncCanvas(index)
             })
         },
-        handleDraw(event, index) {
-            const canvas = event.target
-            const ctx = canvas.getContext('2d')
-            const whiteboard = this.whiteboards[index]
-            if (whiteboard.mode === 'eraser') {
-                ctx.lineWidth = 30
-                ctx.strokeStyle = '#ffffff'
-            } else {
-                ctx.lineWidth = whiteboard.width
-                ctx.strokeStyle = whiteboard.color
-            }
-            ctx.lineCap = 'round'
-            ctx.lineJoin = 'round'
-            ctx.beginPath()
-            ctx.moveTo(event.offsetX, event.offsetY)
-            document.onmousemove = (e) => {
-                ctx.lineTo(e.offsetX, e.offsetY)
-                ctx.stroke()
-            }
-            document.onmouseup = () => {
-                ctx.closePath()
-                document.onmousemove = null
-                document.onmouseup = null
-            }
-        },
         clear(index) {
             const canvas = this.getCanvas(index)
             canvas.clear()
