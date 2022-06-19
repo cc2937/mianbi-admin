@@ -14,15 +14,21 @@
                     <el-radio-button label="text">文本</el-radio-button>
                 </el-radio-group>
 
-                <el-color-picker v-if="['pen', 'rect', 'text'].includes(item.mode)" v-model="item.color"
-                    :predefine="colors" @change="syncCanvas(index)" />
-                <el-select v-if="item.mode === 'pen'" v-model="item.width" @change="syncCanvas(index)">
-                    <el-option v-for="item in widths" :key="item.value" :value="item.value" :label="item.label">
-                    </el-option>
-                </el-select>
+                <div class="tool-group">
+                    <el-color-picker v-if="['pen', 'rect', 'text'].includes(item.mode)" v-model="item.color"
+                        :predefine="colors" @change="syncCanvas(index)">
+                    </el-color-picker>
+                    <el-select v-if="item.mode === 'pen'" v-model="item.width" @change="syncCanvas(index)"
+                        class="width-selector">
+                        <el-option v-for="item in widths" :key="item.value" :value="item.value" :label="item.label">
+                        </el-option>
+                    </el-select>
+                </div>
 
-                <el-button @click="clear(index)">清屏</el-button>
-                <el-button @click="rename(index)">重命名</el-button>
+                <div class="tool-group">
+                    <el-button @click="clear(index)">清屏</el-button>
+                    <el-button @click="rename(index)">重命名</el-button>
+                </div>
             </div>
         </el-tab-pane>
     </el-tabs>
@@ -192,9 +198,22 @@ export default {
 <style scoped>
 .toolbar {
     display: flex;
+    justify-content: space-between;
 }
 
 .tools {
     margin-right: 24px;
+}
+
+.tool-group {
+    display: flex;
+}
+
+.tool-group :deep(> div) {
+    margin-left: 8px;
+}
+
+.width-selector {
+    width: 100px;
 }
 </style>
