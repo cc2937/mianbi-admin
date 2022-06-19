@@ -26,8 +26,10 @@
                 </div>
 
                 <div class="tool-group">
+                    <el-button @click="removeObject(index)">删除</el-button>
                     <el-button @click="clear(index)">清屏</el-button>
                     <el-button @click="rename(index)">重命名</el-button>
+                    <el-button @click="undo(index)">撤销</el-button>
                 </div>
             </div>
         </el-tab-pane>
@@ -37,6 +39,7 @@
 <script>
 import { fabric } from 'fabric'
 import 'fabric/src/mixins/eraser_brush.mixin.js'
+import 'fabric-history'
 import { ElMessageBox } from 'element-plus'
 import 'element-plus/es/components/message-box/style/css'
 import { markRaw } from 'vue'
@@ -62,6 +65,12 @@ export default {
     methods: {
         init() {
             this.canvasWidth = this.$refs.tabs.$el.getBoundingClientRect().width
+            this.$nextTick(() => {
+                this.whiteboards.forEach((_, index) => {
+                    const canvas = this.getCanvas(index)
+                    canvas.setWidth(this.canvasWidth)
+                })
+            })
         },
         handleRemove(name) {
             const index = this.whiteboards.findIndex(item => item.id === name)
@@ -184,6 +193,15 @@ export default {
                 canvas.skipTargetFind = false
                 fabric.Object.prototype.selectable = true
             }
+        },
+        undo(index) {
+            const canvas = this.getCanvas(index)
+            canvas.undo()
+        },
+        removeObject(index) {
+            const canvas = this.getCanvas(index)
+            const selected = canvas.getActiveObjects()
+            canvas.remove(...selected)
         },
     },
     mounted() {

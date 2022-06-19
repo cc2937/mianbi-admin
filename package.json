@@ -10,6 +10,7 @@
   "dependencies": {
     "element-plus": "^2.2.5",
     "fabric": "^5.2.1",
+    "fabric-history": "^1.6.0",
     "pinia": "^2.0.14",
     "vue": "^3.2.36",
     "vue-router": "^4.0.15"
