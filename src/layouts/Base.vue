@@ -57,9 +57,12 @@ export default {
     },
     computed: {
         menuActive() {
-            const { name, query } = this.$route
+            const { name, query, path } = this.$route
             if (name === 'User' && query.sex) {
                 return `/male-users`
+            }
+            if (path.startsWith('/notes')) {
+                return '/notes'
             }
             return this.$route.path
         }
