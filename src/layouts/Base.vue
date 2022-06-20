@@ -26,10 +26,7 @@
                             面壁者
                         </template>
                         <el-menu-item index="/users">面壁者列表</el-menu-item>
-                        <el-menu-item
-                            index="/male-users"
-                            :route="{ name: 'User', query: { sex: 1 } }"
-                        >
+                        <el-menu-item index="/male-users" :route="{ name: 'User', query: { sex: 1 } }">
                             男性面壁者
                         </el-menu-item>
                     </el-sub-menu>
@@ -38,6 +35,7 @@
                             教学工具
                         </template>
                         <el-menu-item index="/whiteboards">白板</el-menu-item>
+                        <el-menu-item index="/notes">笔记</el-menu-item>
                     </el-sub-menu>
                 </el-menu>
             </el-aside>
@@ -49,29 +47,29 @@
 </template>
 
 <script>
-    import avatar from '@/assets/img/avatar.jpg'
+import avatar from '@/assets/img/avatar.jpg'
 
-    export default {
-        data() {
-            return {
-                avatar,
+export default {
+    data() {
+        return {
+            avatar,
+        }
+    },
+    computed: {
+        menuActive() {
+            const { name, query } = this.$route
+            if (name === 'User' && query.sex) {
+                return `/male-users`
             }
-        },
-        computed: {
-            menuActive() {
-                const { name, query } = this.$route
-                if (name === 'User' && query.sex) {
-                    return `/male-users`
-                }
-                return this.$route.path
-            }
-        },
-        methods: {
-            logout() {
-                this.$router.replace('/login')
-            }
-        },
-    }
+            return this.$route.path
+        }
+    },
+    methods: {
+        logout() {
+            this.$router.replace('/login')
+        }
+    },
+}
 </script>
 
 <style scoped>
@@ -110,7 +108,7 @@
     border-bottom: 0;
 }
 
-.nav :deep(.el-badge__content.is-fixed ){
+.nav :deep(.el-badge__content.is-fixed) {
     transform: translate(calc(100% - 16px), calc(-50% + 20px));
 }
 
