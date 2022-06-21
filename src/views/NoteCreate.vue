@@ -1,10 +1,13 @@
 <template>
     <div>
-        {{ note.content }}
-        <div>
-            <Toolbar :default-config="toolbarConfig" :editor="editor"></Toolbar>
-            <Editor :default-config="editorConfig" @on-created="handleEditorCreated" v-model="note.content"></Editor>
-        </div>
+        <el-form label-width="auto">
+            <el-form-item label="内容">
+                <div class="editor-container">
+                    <Toolbar :default-config="toolbarConfig" :editor="editor" />
+                    <Editor :default-config="editorConfig" @on-created="handleEditorCreated" v-model="note.content" />
+                </div>
+            </el-form-item>
+        </el-form>
     </div>
 </template>
 
@@ -27,7 +30,7 @@ export default {
             },
             editor: null,
             toolbarConfig: {},
-            editorConfig: { placeholder: '在这里写笔记……' },
+            editorConfig: { autoFocus: false },
         }
     },
     methods: {

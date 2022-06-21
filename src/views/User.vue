@@ -78,6 +78,8 @@
 import { ElMessageBox } from 'element-plus'
 import 'element-plus/es/components/message-box/style/css'
 
+import { getUsers, deleteUser } from '@/api/user'
+
 export default {
     data() {
         return {
@@ -86,13 +88,14 @@ export default {
                 { id: 2, name: '线下' },
             ],
             query: {
+                page: 1,
+                perPage: 10,
+                q: '',
+                sex: '',
                 type: '',
                 start: '',
             },
-            users: [
-                { id: 1, type: 2, username: '华山', name: '华晨', avatar: 'https://tva1.sinaimg.cn/large/e6c9d24egy1h36tkf2rxrj20po0q4gp4.jpg', start: '2022-04-18', level: 3, score: 8876, badges: [] },
-                { id: 2, type: 2, username: '小龙', name: '方晓龙', avatar: 'https://tva1.sinaimg.cn/large/e6c9d24egy1h36ok2cgx6j20py0q2jsy.jpg', start: '2022-04-18', level: 6, score: 66666, badges: [] },
-            ],
+            users: [],
             visible: false,
             form: this.getFreshForm(),
             rules: {
@@ -115,7 +118,14 @@ export default {
             return !!this.selection.length
         },
     },
+    created() {
+        this.getUsers()
+    },
     methods: {
+        async getUsers() {
+            const res = await getUsers(this.query)
+            this.users = res.data
+        },
         getTypeText(typeId) {
             const type = this.types.find(item => item.id === typeId)
             return type ? type.name : '未知'
@@ -159,7 +169,8 @@ export default {
                     cancelButtonText: '取消',
                     type: 'warning',
                 })
-                // 执行删除
+                await deleteUser(id)
+                await this.getUsers()
             } catch (error) { }
         },
         handleChange(selection) {
