@@ -4,9 +4,6 @@
             <el-form-item label="日期">
                 <el-date-picker v-model="query.date" />
             </el-form-item>
-            <el-form-item label="搜索词">
-                <el-input v-model="query.q"></el-input>
-            </el-form-item>
             <el-form-item label="可见性">
                 <el-select v-model="query.isPublic">
                     <el-option value="" label="全部"></el-option>
@@ -14,8 +11,8 @@
                     <el-option :value="0" label="私有"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item>
-                <el-button @click="search">搜索</el-button>
+            <el-form-item label="关键词">
+                <el-input v-model="query.q"></el-input>
             </el-form-item>
         </el-form>
 
@@ -60,6 +57,23 @@ export default {
             total: 0,
             notes: [],
         }
+    },
+    watch: {
+        // query: {
+        //     deep: true,
+        //     handler(newQuery, oldQuery) {
+        //         this.search()
+        //     },
+        // },
+        'query.date'() {
+            this.search()
+        },
+        'query.isPublic'() {
+            this.search()
+        },
+        'query.q'() {
+            this.search()
+        },
     },
     created() {
         this.getNotes()
