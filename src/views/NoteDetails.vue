@@ -1,10 +1,9 @@
 <template>
     <div>
         笔记详情
-        {{ $route.params.id }}
-
-        <div>{{ note.content }}</div>
+        <div>{{ note.title }}</div>
         <div v-html="note.content"></div>
+        <div>{{ note.isPublic ? '公开' : '私有' }}</div>
     </div>
 </template>
 
