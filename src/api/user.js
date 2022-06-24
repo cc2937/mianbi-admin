@@ -1,5 +1,13 @@
 import request from "../utils/request"
 
+export function login(data) {
+    return request({
+        method: 'POST',
+        url: '/auth/login',
+        data,
+    })
+}
+
 export function getUsers(params = {}) {
     return request({
         method: 'GET',

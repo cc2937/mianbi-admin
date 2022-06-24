@@ -19,6 +19,10 @@
 </template>
 
 <script>
+import { login } from "@/api/user";
+import { ElMessage } from "element-plus";
+import 'element-plus/es/components/message/style/css'
+
 export default {
     data() {
         return {
@@ -54,7 +58,15 @@ export default {
         login() {
             this.$refs.form.validate((valid) => {
                 if (valid) {
-                    this.$router.replace('/')
+                    login(this.user)
+                        .then(res => {
+                            const { token } = res.data
+                            localStorage.setItem('token', token)
+                            this.$router.replace('/')
+                        })
+                        .catch(err => {
+                            ElMessage.error(err.response.data.message)
+                        })
                 }
             })
         }
