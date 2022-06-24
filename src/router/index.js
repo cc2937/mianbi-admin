@@ -16,6 +16,7 @@ const router = createRouter({
       path: '/login',
       name: 'Login',
       component: Login,
+      meta: { authRequired: false },
     },
     {
       path: '/',
@@ -59,6 +60,18 @@ const router = createRouter({
       ],
     },
   ]
+})
+
+// rouetr.beforeEach() 全局导航守卫
+router.beforeEach((to, from, next) => {
+  if (to.meta.authRequired === false) {
+    return next()
+  }
+  const token = localStorage.getItem('token')
+  if (token) {
+    return next()
+  }
+  next('/login')
 })
 
 export default router
